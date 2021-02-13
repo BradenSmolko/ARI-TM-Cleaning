@@ -1,2 +1,2 @@
 # ARI-TM-Cleaning
-Cleaning code and files for the ARI Topic Modeling Project.
+R code to clean text data for an ARI Topic Modeling Project.
