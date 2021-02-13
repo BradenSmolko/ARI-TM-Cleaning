@@ -3,6 +3,11 @@ title: "Cleaning Notebook V2"
 output: html_notebook
 ---
 
+# Notebook to clean text data
+Need to clean text data for topic modeling analysis. Data acquired from transcribed interviews.
+
+### Setup 
+Install and load packages and select files for use.
 ```{r}
 # Install and load packages
 
@@ -13,21 +18,21 @@ library("utf8")
 library("tm")
 library("textclean")
 
-# Choose file and load it in
+# Choose file with a column of text to clean and load it in
 the_file <- choose.files()
 original_dat <- read.csv(the_file)
 colnames(original_dat)
 ```
 
 ```{r}
-# Select "StopWordList-ARI Project.txt"
-stop_words_file <- choose.files()
-
-our_stop_words <- readLines(stop_words_file)
+# Read in our project-specific stop words
+stop_words_file <- choose.files() # Select "StopWordList-ARI Project.txt"
+our_stop_words <- readLines(stop_words_file) # Read it in
 ```
 
 
 
+### Actual cleaning part
 
 ```{r}
 # Data variable to work with
@@ -68,27 +73,26 @@ dat$clean_text <- lapply(dat$clean_text, utf8_normalize, map_quote = TRUE) #Get 
 
 # Remove some extra punctuation and formatting
 dat$clean_text <- gsub('[[:punct:]]', '', dat$clean_text) #remove punctuation
-#dat$clean_text <- gsub('[“”]',' ', dat$clean_text) #Remove the fancy quotes
 dat$clean_text <- gsub('…',' ', dat$clean_text) #Remove the fancy ellipses
 dat$clean_text <- removeNumbers(dat$clean_text) #Remove numbers
 
-# Combine our list of stop words with a standard english stop word list
+# Combine our list of stop words with a standard English stop word list
 our_stop_words <- append(stopwords(kind = "en"), our_stop_words)
 stop_words_regex <- paste(our_stop_words, collapse = '\\b|\\b') # Work-around that someone said helps with an error from tm package
 stop_words_regex <- paste0('\\b', stop_words_regex, '\\b')
 
 dat$clean_text <- stringr::str_replace_all(dat$clean_text, stop_words_regex, '') # Remove stop words
 
-
-
+# Make it pretty
 dat$clean_text <- gsub("\\s+", " ", dat$clean_text) #Condense all the huge spaces to one
-
 dat$clean_text <- trimws(dat$clean_text, which = "both")#Remove whitespace and \t and \n
 
 head(dat$clean_text)
 
 
 ```
+
+### Output to CSV if you want to
 
 ```{r}
 # Un-comment and change the file path if you want to write it out to a csv
