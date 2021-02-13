@@ -25,7 +25,7 @@ colnames(original_dat)
 ```
 
 ```{r}
-# Read in our project-specific stop words
+# Read in our project-specific stop words list
 stop_words_file <- choose.files() # Select "StopWordList-ARI Project.txt"
 our_stop_words <- readLines(stop_words_file) # Read it in
 ```
@@ -42,14 +42,14 @@ dat <- original_dat
 dat$clean_text <- dat$Before.Clean
 
 # Remove all words inside [...]
-dat$clean_text <- gsub("\\[[^\\]]*\\]", "", dat$clean_text, perl=TRUE);
+dat$clean_text <- gsub("\\[[^\\]]*\\]", " ", dat$clean_text, perl=TRUE);
 
 # Replace some Military acronyms
-dat$clean_text <- gsub('AOCs','AOC', dat$clean_text) # AOCs --> AOC
-dat$clean_text <- gsub('NCOs','NCO', dat$clean_text) # AOCs --> AOC
-dat$clean_text <- gsub('AMI','Annual Military Inspection', dat$clean_text) # AMI --> Annual Military Inspection
-dat$clean_text <- gsub('OSI','Office of Special Investigations', dat$clean_text) # OSI --> Office of Special Investigations
-dat$clean_text <- gsub('AMT','Academy Military Trainer', dat$clean_text) # AMT --> Academy Military Trainer
+dat$clean_text <- gsub('AOCs','AOC ', dat$clean_text) # AOCs --> AOC
+dat$clean_text <- gsub('NCOs','NCO ', dat$clean_text) # AOCs --> AOC
+dat$clean_text <- gsub('AMI','Annual Military Inspection ', dat$clean_text) # AMI --> Annual Military Inspection
+dat$clean_text <- gsub('OSI','Office of Special Investigations ', dat$clean_text) # OSI --> Office of Special Investigations
+dat$clean_text <- gsub('AMT','Academy Military Trainer ', dat$clean_text) # AMT --> Academy Military Trainer
 
 # Replace the dashes in the text with a space (yes these are 3 DIFFERENT dashes)
 dat$clean_text <- gsub('—',' ', dat$clean_text) #Remove the long dashes
@@ -57,24 +57,29 @@ dat$clean_text <- gsub('–',' ', dat$clean_text) #Remove the dashes
 dat$clean_text <- gsub('-',' ', dat$clean_text) #Remove the dashes
 
 # Replace some words/contractions
-dat$clean_text <- gsub('ole','old', dat$clean_text) # ole --> old
-dat$clean_text <- gsub('learnin','learning', dat$clean_text) # learnin --> learning
+dat$clean_text <- gsub('ole','old ', dat$clean_text) # ole --> old
+dat$clean_text <- gsub('learnin','learning ', dat$clean_text) # learnin --> learning
+dat$clean_text <- gsub('somethin','something ', dat$clean_text) # somethin --> something
+dat$clean_text <- gsub('kinda','kind of ', dat$clean_text) # kinda --> kind of
+
+dat$clean_text <- gsub('interviewee', ' ', dat$clean_text, ignore.case = TRUE) # Remove those tricky "Interviewee"s that pop up
+
 dat$clean_text <- lapply(dat$clean_text, replace_non_ascii) # Change non-ascii characters like curly quote
 dat$clean_text <- lapply(dat$clean_text, replace_contraction) # Remove contractions
 
 
 # Replace some digits with words
-dat$clean_text <- gsub('100','One Hundred', dat$clean_text) # 100 --> One Hundred
-dat$clean_text <- gsub('60','Sixty', dat$clean_text) # 60 --> Sixty
+dat$clean_text <- gsub('100','One Hundred ', dat$clean_text) # 100 --> One Hundred
+dat$clean_text <- gsub('60','Sixty ', dat$clean_text) # 60 --> Sixty
 
 # Lowercase and remove some non utf8 formatting
 dat$clean_text <- tolower(dat$clean_text) #Make all text lower case
 dat$clean_text <- lapply(dat$clean_text, utf8_normalize, map_quote = TRUE) #Get rid of the fancy quotes
 
 # Remove some extra punctuation and formatting
-dat$clean_text <- gsub('[[:punct:]]', '', dat$clean_text) #remove punctuation
-dat$clean_text <- gsub('…',' ', dat$clean_text) #Remove the fancy ellipses
-dat$clean_text <- removeNumbers(dat$clean_text) #Remove numbers
+dat$clean_text <- gsub('[[:punct:]]', ' ', dat$clean_text) # Remove punctuation
+dat$clean_text <- gsub('…',' ', dat$clean_text) # Remove the fancy ellipses
+dat$clean_text <- removeNumbers(dat$clean_text) # Remove numbers
 
 # Combine our list of stop words with a standard English stop word list
 our_stop_words <- append(stopwords(kind = "en"), our_stop_words)
@@ -84,8 +89,8 @@ stop_words_regex <- paste0('\\b', stop_words_regex, '\\b')
 dat$clean_text <- stringr::str_replace_all(dat$clean_text, stop_words_regex, '') # Remove stop words
 
 # Make it pretty
-dat$clean_text <- gsub("\\s+", " ", dat$clean_text) #Condense all the huge spaces to one
-dat$clean_text <- trimws(dat$clean_text, which = "both")#Remove whitespace and \t and \n
+dat$clean_text <- gsub("\\s+", " ", dat$clean_text) # Condense all the huge spaces to one
+dat$clean_text <- trimws(dat$clean_text, which = "both")# Remove whitespace and \t and \n
 
 head(dat$clean_text)
 
@@ -98,4 +103,46 @@ head(dat$clean_text)
 # Un-comment and change the file path if you want to write it out to a csv
 #write.csv(dat, "C:\\Users\\brade\\Documents\\Dynamical Systems Lab\\Topic Modeling\\CleanData.csv")
 ```
+
+### Explore the text 
+
+```{r}
+# Use tm package to create a corpus and explore the terms kept
+corpus <- Corpus(VectorSource(dat$clean_text))
+dtm <- DocumentTermMatrix(corpus)
+tdm <- TermDocumentMatrix(corpus)
+
+# Optionally remove terms that appear in <= 1% of documents
+#tdm <- removeSparseTerms(tdm, .99)
+
+# Looking at the 100 most frequent words
+writeLines("~~~~~~~~~~ Most Frequent Terms ~~~~~~~~~~")
+tdm$dimnames$Terms[1:100]
+
+# Looking at the 100 least frequent words
+writeLines("\n~~~~~~~~~~ Least Frequent Terms ~~~~~~~~~~")
+tdm$dimnames$Terms[(tdm$nrow-100):tdm$nrow]
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
