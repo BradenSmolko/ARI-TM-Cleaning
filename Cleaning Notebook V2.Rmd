@@ -1,0 +1,97 @@
+---
+title: "Cleaning Notebook V2"
+output: html_notebook
+---
+
+```{r}
+# Install and load packages
+
+#install.packages("tm")
+#install.packages("utf8")
+#install.packages("textclean")
+library("utf8")
+library("tm")
+library("textclean")
+
+# Choose file and load it in
+the_file <- choose.files()
+original_dat <- read.csv(the_file)
+colnames(original_dat)
+```
+
+```{r}
+# Select "StopWordList-ARI Project.txt"
+stop_words_file <- choose.files()
+
+our_stop_words <- readLines(stop_words_file)
+```
+
+
+
+
+```{r}
+# Data variable to work with
+dat <- original_dat
+
+# Create and initialize new column to output our clean text to
+dat$clean_text <- dat$Before.Clean
+
+# Remove all words inside [...]
+dat$clean_text <- gsub("\\[[^\\]]*\\]", "", dat$clean_text, perl=TRUE);
+
+# Replace some Military acronyms
+dat$clean_text <- gsub('AOCs','AOC', dat$clean_text) # AOCs --> AOC
+dat$clean_text <- gsub('NCOs','NCO', dat$clean_text) # AOCs --> AOC
+dat$clean_text <- gsub('AMI','Annual Military Inspection', dat$clean_text) # AMI --> Annual Military Inspection
+dat$clean_text <- gsub('OSI','Office of Special Investigations', dat$clean_text) # OSI --> Office of Special Investigations
+dat$clean_text <- gsub('AMT','Academy Military Trainer', dat$clean_text) # AMT --> Academy Military Trainer
+
+# Replace the dashes in the text with a space (yes these are 3 DIFFERENT dashes)
+dat$clean_text <- gsub('—',' ', dat$clean_text) #Remove the long dashes
+dat$clean_text <- gsub('–',' ', dat$clean_text) #Remove the dashes
+dat$clean_text <- gsub('-',' ', dat$clean_text) #Remove the dashes
+
+# Replace some words/contractions
+dat$clean_text <- gsub('ole','old', dat$clean_text) # ole --> old
+dat$clean_text <- gsub('learnin','learning', dat$clean_text) # learnin --> learning
+dat$clean_text <- lapply(dat$clean_text, replace_non_ascii) # Change non-ascii characters like curly quote
+dat$clean_text <- lapply(dat$clean_text, replace_contraction) # Remove contractions
+
+
+# Replace some digits with words
+dat$clean_text <- gsub('100','One Hundred', dat$clean_text) # 100 --> One Hundred
+dat$clean_text <- gsub('60','Sixty', dat$clean_text) # 60 --> Sixty
+
+# Lowercase and remove some non utf8 formatting
+dat$clean_text <- tolower(dat$clean_text) #Make all text lower case
+dat$clean_text <- lapply(dat$clean_text, utf8_normalize, map_quote = TRUE) #Get rid of the fancy quotes
+
+# Remove some extra punctuation and formatting
+dat$clean_text <- gsub('[[:punct:]]', '', dat$clean_text) #remove punctuation
+#dat$clean_text <- gsub('[“”]',' ', dat$clean_text) #Remove the fancy quotes
+dat$clean_text <- gsub('…',' ', dat$clean_text) #Remove the fancy ellipses
+dat$clean_text <- removeNumbers(dat$clean_text) #Remove numbers
+
+# Combine our list of stop words with a standard english stop word list
+our_stop_words <- append(stopwords(kind = "en"), our_stop_words)
+stop_words_regex <- paste(our_stop_words, collapse = '\\b|\\b') # Work-around that someone said helps with an error from tm package
+stop_words_regex <- paste0('\\b', stop_words_regex, '\\b')
+
+dat$clean_text <- stringr::str_replace_all(dat$clean_text, stop_words_regex, '') # Remove stop words
+
+
+
+dat$clean_text <- gsub("\\s+", " ", dat$clean_text) #Condense all the huge spaces to one
+
+dat$clean_text <- trimws(dat$clean_text, which = "both")#Remove whitespace and \t and \n
+
+head(dat$clean_text)
+
+
+```
+
+```{r}
+# Un-comment and change the file path if you want to write it out to a csv
+#write.csv(dat, "C:\\Users\\brade\\Documents\\Dynamical Systems Lab\\Topic Modeling\\CleanData.csv")
+```
+
