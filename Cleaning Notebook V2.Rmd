@@ -43,12 +43,18 @@ library("textclean")
 ```{r}
 # Create and initialize new column to output our clean text to
 dat$clean_text <- dat$Segment
-dat$Segment[1]
+dat$clean_text[290]
 ```
 
 ##########################
-*Removing All Punctuation*
+*Removing Some Punctuation*
 ##########################
+#Replace non-ascii characters
+```{r}
+dat$clean_text <- lapply(dat$clean_text, replace_non_ascii) # Change non-ascii characters like curly quote
+dat$clean_text[290]
+```
+
 
 #Remove all words inside [...]
 ```{r}
@@ -56,26 +62,9 @@ dat$clean_text <- gsub("\\[[^\\]]*\\]", " ", dat$clean_text, perl=TRUE, ignore.c
 dat$clean_text[c(1,2,3)]
 ```
 
-#Remove \r
-```{r}
-dat$clean_text <- gsub("\r", " ", dat$clean_text, perl=TRUE, ignore.case=T)
-dat$clean_text[c(1,2,30)]
-```
-
-#Remove \t
-```{r}
-dat$clean_text <- gsub("\t", " ", dat$clean_text, perl=TRUE, ignore.case=T)
-dat$clean_text[c(1,2,50)]
-```
-
-#Remove \n
-```{r}
-dat$clean_text <- gsub("\n", " ", dat$clean_text, perl=TRUE, ignore.case=T)
-dat$clean_text[c(25:30)]
-```
 #Remove \
 ```{r}
-dat$clean_text <- gsub("\n", " ", dat$clean_text, perl=TRUE, ignore.case=T)
+dat$clean_text <- gsub("\"", " ", dat$clean_text, perl=TRUE, ignore.case=T)
 dat$clean_text[c(25:30)]
 ```
 
@@ -104,15 +93,6 @@ dat$clean_text[203:205]
 dat$clean_text <- lapply(dat$clean_text, replace_contraction) # Remove contractions
 dat$clean_text[204:206]
 
-```
-
-# Replace the " in the text with a space (yes these are 3 DIFFERENT dashes)
-```{r}
-dat$clean_text <- gsub('—',' ', dat$clean_text) #Remove the long dashes
-dat$clean_text <- gsub('–',' ', dat$clean_text) #Remove the dashes
-dat$clean_text <- gsub('-',' ', dat$clean_text) #Remove the dashes
-
-dat$clean_text[203:205]
 ```
 
 #####################
@@ -220,334 +200,238 @@ dat$clean_text <- gsub("0:", " ", dat$clean_text, ignore.case=T)
 
 ```
 
-#Colon
+#Colon not followed by a digit (keep time stamps)
 ```{r}
-dat$clean_text <- gsub(":", " ", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub(":(?!\\d)", " ", dat$clean_text, perl = TRUE, ignore.case=T)
 ```
-
-# Condense all the huge spaces to one
-```{r}
-dat$clean_text <- gsub("\\s+", " ", dat$clean_text)
-head(dat$clean_text)
-
-```
-
 
 ####################################
 *Remove Verbal Stop Words (Not NLP)*
 ####################################
 
-##########
-Lower Case
-##########
-
 #mhmm
 ```{r}
-dat$clean_text <- gsub("\\mhmmmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mhmmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mhmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mhmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mhm.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhmmmmm\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhmmmm\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhmmm\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhmm\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhm\\.\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\mhmmmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mhmmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mhmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mhmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mhm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhmmmmm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhmmmm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhmmm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhmm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhm,\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\mhmmmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mhmmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mhmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mhmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mhm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhmmmmm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhmmmm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhmmm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhmm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmhm\\b", "", dat$clean_text, ignore.case=T)
 ```
 
 #hmm
 ```{r}
-dat$clean_text <- gsub("\\hmmmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\hmmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\hmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\hmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\hm.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhmmmmm\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhmmmm\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhmmm\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhmm\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhm\\.\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\hmmmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\hmmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\hmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\hmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\hm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhmmmmm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhmmmm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhmmm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhmm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhm,\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\hmmmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\hmmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\hmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\hmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\hm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhmmmmm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhmmmm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhmmm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhmm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhm\\b", "", dat$clean_text, ignore.case=T)
 ```
 
 #umm
 ```{r}
-dat$clean_text <- gsub("\\ummmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ummmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ummm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\umm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\um.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bummmmm\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bummmm\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bummm\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bumm\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bum\\.\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\ummmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ummmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ummm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\umm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\um,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bummmmm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bummmm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bummm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bumm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bum,\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\ummmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ummmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ummm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\umm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\um\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bummmmm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bummmm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bummm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bumm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bum\\b", "", dat$clean_text, ignore.case=T)
 ```
 
 #mm
 ```{r}
-dat$clean_text <- gsub("\\mmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mm.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmmm\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmm\\.\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\mmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmmm,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmm,\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\mmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\mm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmmm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmm\\b", "", dat$clean_text, ignore.case=T)
 ```
 
 #ah
 ```{r}
-dat$clean_text <- gsub("\\ahhhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ahhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ahhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ahh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ah.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bahhhhh\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bahhhh\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bahhh\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bahh\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bah\\.\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\ahhhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ahhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ahhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ahh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ah,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bahhhhh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bahhhh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bahhh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bahh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bah,\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\ahhhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ahhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ahhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ahh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ah\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bahhhhh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bahhhh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bahhh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bahh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bah\\b", "", dat$clean_text, ignore.case=T)
 ```
 
 #Uh
 ```{r}
-dat$clean_text <- gsub("\\uhhhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\uhhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\uhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\uhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\uh.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buhhhhh\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buhhhh\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buhhh\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buhh\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buh\\.\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\uhhhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\uhhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\uhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\uhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\uh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buhhhhh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buhhhh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buhhh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buhh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buh,\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\uhhhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\uhhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\uhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\uhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\uh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buhhhhh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buhhhh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buhhh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buhh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\buh\\b", "", dat$clean_text, ignore.case=T)
 ```
 
 #oh
 ```{r}
-dat$clean_text <- gsub("\\ohhhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ohhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ohhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ohh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\oh.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bohhhhh\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bohhhh\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bohhh\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bohh\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\boh\\.\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\ohhhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ohhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ohhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ohh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\oh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bohhhhh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bohhhh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bohhh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bohh,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\boh,\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\ohhhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ohhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ohhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\ohh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\oh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bohhhhh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bohhhh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bohhh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bohh\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\boh\\b", "", dat$clean_text, ignore.case=T)
 ```
 
+#############
+*Changing -in' to ing*
+#############
 
-##########
-Upper Case
-##########
-
-#mhmm
 ```{r}
-dat$clean_text <- gsub("\\Mhmmmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mhmmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mhmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mhmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mhm.\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Mhmmmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mhmmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mhmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mhmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mhm,\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Mhmmmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mhmmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mhmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mhmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mhm\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\btalkin'\\b", "talking", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bthinkin'\\b", "thinking", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bcomin'\\b", "coming", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bnothin'\\b", "nothin", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmissin'\\b", "missing", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bem'\\b", "them", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bdrinkin'\\b", "drinking", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bdoin'\\b", "doing", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bfraternizin'\\b", "fraternizing", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\baskin'\\b", "asking", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bworkin'\\b", "working", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bmakin'\\b", "making", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bshowin'\\b", "showing", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhurtin'\\b", "hurting", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bkinda\\b", "kind of", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bsayin'\\b", "saying", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\byellin'\\b", "yelling", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bwakin'\\b", "waking", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bscreamin'\\b", "screaming", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bgettin'\\b", "getting", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bwoulda\\b", "would have", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bfloatin'\\b", "floating", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bwanna\\b", "want to", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\btryin'\\b", "trying", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bfrickin'\\b", "fricking", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\blookin'\\b", "looking", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bwatchin'\\b", "watching", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\cuz\\b", "because", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\benforcin'\\b", "enforcing", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\btalkie\\b", "talking", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bhelpin'\\b", "helping", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\b'til\\b", "until", dat$clean_text, ignore.case=T)
 ```
-
-#hmm
-```{r}
-dat$clean_text <- gsub("\\Hmmmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Hmmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Hmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Hmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Hm.\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Hmmmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Hmmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Hmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Hmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Hm,\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Hmmmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Hmmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Hmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Hmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Hm\\b", "", dat$clean_text, ignore.case=T)
-```
-
-#umm
-```{r}
-dat$clean_text <- gsub("\\Ummmmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ummmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ummm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Umm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Um.\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Ummmmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ummmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ummm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Umm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Um,\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Ummmmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ummmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ummm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Umm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Um\\b", "", dat$clean_text, ignore.case=T)
-```
-
-#mm
-```{r}
-dat$clean_text <- gsub("\\Mmm.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mm.\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Mmm,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mm,\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Mmm\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Mm\\b", "", dat$clean_text, ignore.case=T)
-```
-
-#ah
-```{r}
-dat$clean_text <- gsub("\\Ahhhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ahhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ahhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ahh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ah.\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Ahhhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ahhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ahhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ahh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ah,\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Ahhhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ahhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ahhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ahh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ah\\b", "", dat$clean_text, ignore.case=T)
-```
-
-#uh
-```{r}
-dat$clean_text <- gsub("\\Uhhhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Uhhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Uhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Uhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Uh.\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Uhhhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Uhhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Uhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Uhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Uh,\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Uhhhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Uhhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Uhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Uhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Uh\\b", "", dat$clean_text, ignore.case=T)
-```
-
-#oh
-```{r}
-dat$clean_text <- gsub("\\Ohhhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ohhhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ohhh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ohh.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Oh.\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Ohhhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ohhhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ohhh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ohh,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Oh,\\b", "", dat$clean_text, ignore.case=T)
-
-dat$clean_text <- gsub("\\Ohhhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ohhhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ohhh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Ohh\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Oh\\b", "", dat$clean_text, ignore.case=T)
-```
-
 
 #############
 *Wrapping-Up*
 #############
 
-#Remove Commas
+#Remove Commas that are not followed by digits
 ```{r}
-dat$clean_text <- gsub(",", " ", dat$clean_text)
-dat$clean_text[350]
+dat$clean_text <- gsub(",(?!\\d)", " ", perl = TRUE, dat$clean_text)
+dat$clean_text[405]
 ```
+
+#Remove apostrophes
+```{r}
+dat$clean_text <- gsub("'", " ", perl = TRUE, dat$clean_text)
+dat$clean_text[405]
+```
+
+#Remove the " . "
+```{r}
+dat$clean_text <- gsub("\\s\\.\\s", " ", dat$clean_text)
+dat$clean_text[352]
+dat$clean_text[78]
+```
+
+#Remove the "..."
+```{r}
+dat$clean_text <- gsub("\\.\\.\\.", " ", dat$clean_text)
+dat$clean_text[352]
+dat$clean_text[76]
+```
+
+#Remove single-letter words expect "i" and "a" (stray letters from stuttering)
+```{r}
+dat$clean_text <- gsub("\\b[^ia]\\b", " ", dat$clean_text, ignore.case = TRUE)
+dat$clean_text[190]
+```
+
 #Remove Spaces
 ```{r}
 dat$clean_text <- gsub("\\s+", " ", dat$clean_text)
 dat$clean_text[350]
+dat$clean_text[78]
 ```
 
 #Remove Space at Beginning
 ```{r}
 dat$clean_text <- gsub("^\\s", "", dat$clean_text)
-dat$clean_text[350]
-dat$clean_text[78]
-```
-
-#Remove Spaces
-```{r}
-dat$clean_text <- gsub("\\s+", " ", dat$clean_text)
 dat$clean_text[350]
 dat$clean_text[78]
 ```
@@ -565,25 +449,28 @@ write.csv(dat, "2.13 ARI Cleaned Data (Step 1).csv")
 #Step 2 - Removing Like & Just Words
 ```{r}
 #Like
-dat$clean_text <- gsub("\\Like.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Like,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Like\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bLike\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bLike,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bLike\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\like.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\like,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\like\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\blike\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\blike,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\blike\\b", "", dat$clean_text, ignore.case=T)
 
 
 #Just
-dat$clean_text <- gsub("\\Just.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Just,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\Just\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bJust\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bJust,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bJust\\b", "", dat$clean_text, ignore.case=T)
 
-dat$clean_text <- gsub("\\just.\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\just,\\b", "", dat$clean_text, ignore.case=T)
-dat$clean_text <- gsub("\\just\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bjust\\.\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bjust,\\b", "", dat$clean_text, ignore.case=T)
+dat$clean_text <- gsub("\\bjust\\b", "", dat$clean_text, ignore.case=T)
 ```
 
+```{r}
+write.csv(dat, "2.13 ARI Cleaned Data (Step 2).csv")
+```
 
 ### Explore the text 
 
