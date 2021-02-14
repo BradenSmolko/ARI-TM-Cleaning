@@ -1,0 +1,47 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+Load the libraries and run the other R file to get the "test" dataset which is actually the cleaned dataset
+
+Or import a cleaned dataset here:
+
+```{r}
+file_location <- choose.files()
+test <- read.csv(file_location)
+colnames(test)
+```
+
+
+Got a max score at 77 topics
+```{r}
+#install.packages("ldatuning")
+#install.packages("topicmodels")
+#install.packages("beepr")
+library("ldatuning")
+library("topicmodels")
+library("tm")
+library("beepr")
+
+myCorpus <- test
+corpus <- Corpus(VectorSource(myCorpus$clean_text)) # Choose the column with the cleaned text
+text_data <- TermDocumentMatrix(corpus)
+
+
+
+result <- FindTopicsNumber(
+        text_data,
+        topics = seq(from = 10, to = 110, by = 10),
+        metrics = c("Griffiths2004"),
+        method = "Gibbs",
+        control = list(seed = 3737),
+        mc.cores = 4L,
+        verbose = TRUE
+)
+
+FindTopicsNumber_plot(result)
+beep("fanfare")
+
+```
